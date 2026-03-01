@@ -1,0 +1,21 @@
+[project]
+name = "mario-bot"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "gym==0.26.2",
+    "gym-super-mario-bros>=7.4.0",
+    "matplotlib>=3.10.8",
+    "nes-py>=8.2.1",
+    "numpy<2.0",
+    "opencv-python>=4.11.0.86",
+    "setuptools>=82.0.0",
+    "shimmy>=2.0",
+    "stable-baselines3>=2.7.1",
+    "tensorboard>=2.20.0",
+    "torch>=2.10.0",
+    "torchvision>=0.25.0",
+    "wandb>=0.25.0",
+]
