@@ -1,6 +1,6 @@
 # Mario Bot — Deep RL from Scratch
 
-Teaching an agent to play **Super Mario Bros** using **Proximal Policy Optimization (PPO)** implemented from scratch in PyTorch. The goal is to understand every component of the pipeline so that RL libraries like SB3 and TorchRL become easy to pick up afterward.
+Teaching an agent to play **Super Mario Bros** using **Proximal Policy Optimization (PPO)** implemented from scratch in PyTorch.
 
 ---
 
@@ -9,7 +9,7 @@ Teaching an agent to play **Super Mario Bros** using **Proximal Policy Optimizat
 ```
 mario_bot/
 ├── pyproject.toml              # UV — dependencies and project metadata
-├── training_schedule.py        # Entry point — toggles, config, wiring
+├── training_schedule.py        # Entry point — config
 ├── models/
 │   └── policy.py               # Net — shared CNN → actor head + critic head
 ├── losses/
@@ -46,10 +46,10 @@ uv sync
 
 ## Training
 
-All configuration lives at the top of `training_schedule.py`. Edit the toggles and config dict, then run:
+All configuration lives at the top of `training_schedule.py`. Edit the config dict, then run:
 
 ```bash
-uv run python training_schedule.py
+uv run training_schedule.py
 ```
 
 **Key toggles:**
@@ -151,8 +151,6 @@ total = policy_loss + 0.5·value_loss + 0.01·entropy_loss
 ---
 
 ## Roadmap
-
-This repo is designed so future experiments slot in cleanly. New algorithms add a file to `losses/` and a trainer subclass in `trainer/` — everything else (environment, logging, checkpointing) is reused.
 
 ### Models to Try
 - [ ] Recurrent policy (LSTM backbone) — for partial observability / long-horizon memory
