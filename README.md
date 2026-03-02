@@ -14,13 +14,15 @@ mario_bot/
 │   └── policy.py               # Net — shared CNN → actor head + critic head
 ├── losses/
 │   └── ppo_loss.py             # Clipped surrogate + value loss + entropy bonus
-├── logs/
-│   └── logger.py               # Logger — WandB + TensorBoard + matplotlib
+├── logs/                       # Saved logs (gitignored)
 ├── weights/                    # Saved checkpoints (gitignored)
+├── configs/                    # Saved json config containing parameter config for that run (gitignored)
+├── wandb/                      # Wandb logs (gitignored)
 ├── utils/
 │   ├── data_reader.py          # MarioEnv wrapper + make_env() factory
 │   ├── dataset.py              # RolloutBuffer — GAE-λ advantage estimation
 │   └── augment.py              # ObsAugmenter — optional Gaussian noise
+│   └── logger.py               # Logger — WandB + TensorBoard + matplotlib
 └── trainer/
     ├── base_trainer.py         # Abstract Trainer — save/load checkpoint
     └── RL_trainer.py           # RLTrainer — rollout collection + PPO update loop
@@ -52,16 +54,6 @@ All configuration lives at the top of `training_schedule.py`. Edit the config di
 uv run training_schedule.py
 ```
 
-**Key toggles:**
-
-```python
-USE_AUGMENTATION = False   # Gaussian noise on observations
-USE_WANDB        = True    # Log to Weights & Biases
-USE_TENSORBOARD  = True    # Log to TensorBoard
-
-DEVICE = "mps"             # "mps" (Apple Silicon) | "cuda" (NVIDIA) | "cpu"
-```
-
 **Hyperparameters:**
 
 | Parameter | Default | Description |
@@ -88,10 +80,11 @@ tensorboard --logdir logs/tensorboard
 **Watch the trained agent play:**
 
 ```python
-# In training_schedule.py, change render_mode and uncomment load_checkpoint:
-env = make_env(render_mode="human")
-trainer.load_checkpoint("weights/mario_ppo_final.pt")
-trainer.test_loop(env, n_episodes=5)
+# Change the path for the model weights in evaluate.py then run:
+# CHECKPOINT = "./weights/mario_ppo_final.pt"
+python evaluate.py
+# or run the specific checkpoint
+python evaluate.py "./weights/20260302_Net_RLTrainer_lr0p00025_n_epochs4_batch_size64_gamma0p9_0/step_151552.pt"
 ```
 
 ---
