@@ -94,13 +94,14 @@ class RLTrainer(Trainer):
     # Core training entry point
     # ------------------------------------------------------------------
 
-    def train(self, env, total_timesteps: int, augmenter=None):
+    def train(self, env, total_timesteps: int, run_name: str = "run", augmenter=None):
         """
         Full PPO training loop.
 
         Args:
             env:             Vectorized environment from make_env()
             total_timesteps: Stop after this many env steps
+            run_name:        Run identifier — weights and logs are namespaced under it
             augmenter:       Optional ObsAugmenter (or None)
         """
         device = next(self.model.parameters()).device
@@ -114,7 +115,7 @@ class RLTrainer(Trainer):
         gae_lambda: float = config["gae_lambda"]
         checkpoint_freq: int = config.get("checkpoint_freq", 50_000)
 
-        global_step = 0
+        global_step = getattr(self, "_resume_step", 0)
         episode_rewards: list[float] = []
         current_ep_reward = 0.0
         obs = env.reset()
@@ -193,11 +194,11 @@ class RLTrainer(Trainer):
 
             # ── 6. Checkpoint ──────────────────────────────────────────
             if global_step % checkpoint_freq < n_steps:
-                ckpt_path = os.path.join("weights", f"mario_ppo_{global_step}.pt")
+                ckpt_path = os.path.join("weights", run_name, f"step_{global_step}.pt")
                 self.save_checkpoint(ckpt_path)
 
         # Final checkpoint + plot
-        self.save_checkpoint(os.path.join("weights", "mario_ppo_final.pt"))
+        self.save_checkpoint(os.path.join("weights", run_name, "final.pt"))
         self.logger.save_plot(episode_rewards)
         self.logger.close()
         print(f"[RLTrainer] Training complete. {len(episode_rewards)} episodes finished.")

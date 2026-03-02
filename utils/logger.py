@@ -2,8 +2,13 @@
 """
 Logger — unified interface for WandB, TensorBoard, and matplotlib.
 
+All outputs for a run are scoped under logs/<run_name>/:
+    logs/<run_name>/          ← TensorBoard events
+    logs/<run_name>/rewards.png
+
 Usage:
-    logger = Logger(use_wandb=True, use_tensorboard=True, project="mario-ppo")
+    logger = Logger(use_wandb=True, use_tensorboard=True,
+                    project="mario-ppo", run_name="20260302_Net_RLTrainer_lr2p5e-04_n_epochs4_0")
     logger.log({"reward": 42.0, "loss/policy": 0.1}, step=1000)
     logger.save_plot(episode_rewards)
     logger.close()
@@ -23,16 +28,19 @@ class Logger:
         use_wandb: bool = True,
         use_tensorboard: bool = True,
         project: str = "mario-ppo",
-        log_dir: str = "logs/tensorboard",
+        run_name: str = "run",
         config: Optional[dict] = None,
         resume_run_id: Optional[str] = None,
     ):
         self.use_wandb = use_wandb
         self.use_tensorboard = use_tensorboard
+        self.run_name = run_name
+
+        log_dir = os.path.join("logs", run_name)
 
         if use_wandb:
             import wandb
-            wandb.init(project=project, config=config or {})
+            wandb.init(project=project, name=run_name, config=config or {})
             self._wandb = wandb
 
         if use_tensorboard:
@@ -55,8 +63,9 @@ class Logger:
             for key, value in metrics.items():
                 self._writer.add_scalar(key, value, global_step=step)
 
-    def save_plot(self, episode_rewards: list, path: str = "training_rewards.png"):
-        """Save a matplotlib line plot of episode rewards."""
+    def save_plot(self, episode_rewards: list, path: Optional[str] = None):
+        """Save a matplotlib line plot of episode rewards to logs/<run_name>/rewards.png."""
+        plot_path: str = path or os.path.join("logs", self.run_name, "rewards.png")
         fig, ax = plt.subplots(figsize=(10, 4))
         ax.plot(episode_rewards, linewidth=0.8, alpha=0.7, label="Episode reward")
 
@@ -72,9 +81,10 @@ class Logger:
         ax.set_title("Mario PPO — Training rewards")
         ax.legend()
         fig.tight_layout()
-        fig.savefig(path, dpi=120)
+        os.makedirs(os.path.dirname(plot_path), exist_ok=True)
+        fig.savefig(plot_path, dpi=120)
         plt.close(fig)
-        print(f"[Logger] Saved plot → {path}")
+        print(f"[Logger] Saved plot → {plot_path}")
 
     def close(self):
         """Flush and close all backends."""

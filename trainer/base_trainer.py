@@ -14,7 +14,7 @@ import torch
 import torch.nn as nn
 from torch.optim import Optimizer
 
-from logs.logger import Logger
+from utils.logger import Logger
 
 
 class Trainer(ABC):
@@ -69,4 +69,5 @@ class Trainer(ABC):
         checkpoint = torch.load(path, map_location="cpu")
         self.model.load_state_dict(checkpoint["model_state"])
         self.optimizer.load_state_dict(checkpoint["optimizer_state"])
+        self._resume_step = checkpoint.get("global_step", 0)
         print(f"[Trainer] Checkpoint loaded ← {path}")

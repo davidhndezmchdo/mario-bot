@@ -59,7 +59,9 @@ class PPOLoss:
         policy_loss = -torch.min(ratio * advantages, clipped_ratio * advantages).mean()
 
         # --- Value loss ---
-        value_loss = F.mse_loss(values, returns)
+        returns_normalized = (returns - returns.mean()) / (returns.std() + 1e-8)
+        values_noramalized = (values - values.mean()) / (values.std() + 1e-8)
+        value_loss = F.mse_loss(values_noramalized, returns_normalized)
 
         # --- Entropy bonus (negative because we maximise entropy) ---
         entropy_loss = -entropy.mean()

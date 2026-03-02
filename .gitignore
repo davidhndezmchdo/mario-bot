@@ -15,7 +15,7 @@ wheels/
 # Project outputs
 weights/
 *.png
-logs/tensorboard/
+logs/
 
 # WandB
 wandb/
